@@ -1,0 +1,20 @@
+# アプリケーション名
+app_name = "AWSコスト通知"
+
+# 作者
+author = "xxx"
+
+# デバッグモードかどうか
+debug = true
+
+# AWS設定
+[aws]
+region = "us-east-1"           # AWSリージョン
+access_key_id = ""             # AWSアクセスキーID
+secret_access_key = ""         # AWSシークレットアクセスキー
+
+# Slack通知設定
+[slack]
+enabled = true                 # Slack通知を有効にするか
+webhook_url = ""               # Slack Incoming Webhook URL
+timeout = "10s"                # HTTPリクエストタイムアウト

@@ -1,0 +1,45 @@
+{
+  "name": "Go CLI Development Container",
+  "dockerComposeFile": "compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // ベース拡張機能
+        "anthropic.claude-code",
+        "donjayamanne.githistory",
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        "mhutchie.git-graph",
+        "ms-ceintl.vscode-language-pack-ja",
+        "seatonjiang.gitmoji-vscode",
+        // Go専用拡張機能
+        "golang.go",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        // Go関連設定
+        "go.gopath": "/home/developer/go",
+        "go.goroot": "/usr/local/go",
+        "go.toolsManagement.checkForUpdates": "local",
+        "go.useLanguageServer": true,
+        "go.formatTool": "goimports",
+        "go.lintTool": "golangci-lint",
+        "go.lintOnSave": "package"
+      }
+    }
+  },
+  "postCreateCommand": [
+    "bash",
+    "-c",
+    "if [ -f ~/.zshrc_host ]; then echo 'source ~/.zshrc_host' >> ~/.zshrc; fi"
+  ],
+  "remoteUser": "developer"
+}

@@ -1,0 +1,28 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # プロジェクトファイルのマウント
+      - ../..:/workspaces:cached
+      # ホストのzsh設定をマウント（存在する場合）
+      - ~/.zshrc:/home/developer/.zshrc_host:ro
+      - ~/.zsh_history:/home/developer/.zsh_history:cached
+      - ~/.zsh_aliases:/home/developer/.zsh_aliases:ro
+      # Git設定のマウント
+      - ~/.gitconfig:/home/developer/.gitconfig:ro
+      - ~/.ssh:/home/developer/.ssh:ro
+      # Go関連のキャッシュマウント
+      - go-mod-cache:/home/developer/go/pkg/mod
+      - go-build-cache:/home/developer/.cache/go-build
+    environment:
+      - SHELL=/bin/zsh
+      - GOPATH=/home/developer/go
+      - GOBIN=/home/developer/go/bin
+    command: sleep infinity
+    user: developer
+
+volumes:
+  go-mod-cache:
+  go-build-cache:

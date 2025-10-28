@@ -1,0 +1,4 @@
+config.toml
+aws-cost-notifier
+.claude/settings.local.json
+bin/
