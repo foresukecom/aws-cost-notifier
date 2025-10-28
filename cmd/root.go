@@ -15,16 +15,17 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "your_cli_app", // ★★★ ここをあなたのCLIアプリケーション名に置き換えてください ★★★
-	Short: "A sample Go CLI application with Cobra and Viper",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "aws-cost-notifier",
+	Short: "AWS Cost Explorer APIを使用してコストをSlackに通知",
+	Long: `AWS Cost Notifier - AWSコスト管理ツール
 
-This application demonstrates basic CLI structure with Cobra and
-configuration management using Viper.`, // 説明を少し変更
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+前日のコスト、サービス別の使用状況、当月の予測コストを
+AWS Cost Explorer APIから取得してSlackに通知します。
+
+Cron等での定期実行に対応しています。`,
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true, // completionコマンドを無効化
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -44,8 +45,7 @@ func init() {
 	// Cobra が初期化される前に特定の関数を実行する設定
 	cobra.OnInitialize(initViper)
 
-	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(infoCmd)
+	// サブコマンドは各ファイルのinit()で登録される
 }
 
 // initViper reads in config file and ENV variables if set.

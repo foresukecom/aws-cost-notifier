@@ -50,6 +50,7 @@ var infoCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(infoCmd)
 }
 
 // maskSensitiveDataRecursive は、設定情報を再帰的に処理し、機密情報を含むキーの値をマスクします。
