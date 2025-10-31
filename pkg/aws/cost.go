@@ -77,38 +77,7 @@ func (c *CostClient) getDailyCost(ctx context.Context, date time.Time) (*DailyCo
 	start := date.Format("2006-01-02")
 	end := date.AddDate(0, 0, 1).Format("2006-01-02")
 
-	// 合計コストを取得
-	totalInput := &costexplorer.GetCostAndUsageInput{
-		TimePeriod: &types.DateInterval{
-			Start: aws.String(start),
-			End:   aws.String(end),
-		},
-		Granularity: types.GranularityDaily,
-		Metrics: []string{
-			"UnblendedCost",
-		},
-	}
-
-	totalResult, err := c.client.GetCostAndUsage(ctx, totalInput)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get total cost: %w", err)
-	}
-
-	var totalCost float64
-	var currency string
-
-	if len(totalResult.ResultsByTime) > 0 && len(totalResult.ResultsByTime[0].Total) > 0 {
-		if cost, ok := totalResult.ResultsByTime[0].Total["UnblendedCost"]; ok {
-			if cost.Amount != nil {
-				fmt.Sscanf(*cost.Amount, "%f", &totalCost)
-			}
-			if cost.Unit != nil {
-				currency = *cost.Unit
-			}
-		}
-	}
-
-	// サービス別コストを取得
+	// サービス別コストを取得（合計コストもこのレスポンスから計算）
 	serviceInput := &costexplorer.GetCostAndUsageInput{
 		TimePeriod: &types.DateInterval{
 			Start: aws.String(start),
@@ -132,6 +101,8 @@ func (c *CostClient) getDailyCost(ctx context.Context, date time.Time) (*DailyCo
 	}
 
 	var services []ServiceCost
+	var totalCost float64
+	var currency string
 
 	if len(serviceResult.ResultsByTime) > 0 {
 		for _, group := range serviceResult.ResultsByTime[0].Groups {
@@ -146,7 +117,13 @@ func (c *CostClient) getDailyCost(ctx context.Context, date time.Time) (*DailyCo
 								Service: serviceName,
 								Cost:    amount,
 							})
+							// 合計コストを計算
+							totalCost += amount
 						}
+					}
+					// 通貨単位を取得
+					if cost.Unit != nil && currency == "" {
+						currency = *cost.Unit
 					}
 				}
 			}
@@ -166,7 +143,8 @@ func (c *CostClient) getDailyCost(ctx context.Context, date time.Time) (*DailyCo
 	}, nil
 }
 
-// GetMonthlyForecast は当月の予測コストを取得します
+// GetMonthlyForecast は当月の累計コストを取得します
+// Note: 月末予測はCost Explorer APIの追加料金がかかるため、累計のみを取得します
 func (c *CostClient) GetMonthlyForecast(ctx context.Context) (*MonthlyCostSummary, error) {
 	now := time.Now()
 
@@ -204,31 +182,9 @@ func (c *CostClient) GetMonthlyForecast(ctx context.Context) (*MonthlyCostSummar
 		}
 	}
 
-	// 月末までの予測コスト
-	monthEnd := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
-
-	forecastInput := &costexplorer.GetCostForecastInput{
-		TimePeriod: &types.DateInterval{
-			Start: aws.String(today),
-			End:   aws.String(monthEnd.Format("2006-01-02")),
-		},
-		Granularity: types.GranularityMonthly,
-		Metric:      types.MetricUnblendedCost,
-	}
-
-	forecastResult, err := c.client.GetCostForecast(ctx, forecastInput)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get cost forecast: %w", err)
-	}
-
-	var forecastAmount float64
-	if forecastResult.Total != nil && forecastResult.Total.Amount != nil {
-		fmt.Sscanf(*forecastResult.Total.Amount, "%f", &forecastAmount)
-	}
-
 	return &MonthlyCostSummary{
 		MonthToDate: monthToDate,
-		Forecast:    monthToDate + forecastAmount,
+		Forecast:    0, // 予測は無効化（API料金削減のため）
 		Currency:    currency,
 	}, nil
 }

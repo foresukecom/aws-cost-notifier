@@ -124,21 +124,16 @@ func sendCostNotification(n notifier.Notifier, daily *awscost.DailyCostSummary, 
 		Fields: serviceFields,
 	}
 
-	// 月間予測の通知
-	monthlyColor := getColorByAmount(monthly.Forecast)
+	// 月間累計の通知
+	monthlyColor := getColorByAmount(monthly.MonthToDate)
 	monthlyAttachment := notifier.Attachment{
 		Color: monthlyColor,
-		Title: "当月の予測",
+		Title: "当月の累計",
 		Fields: []notifier.AttachmentField{
 			{
 				Title: "月初から現在まで",
 				Value: fmt.Sprintf("$%.2f", monthly.MonthToDate),
-				Short: true,
-			},
-			{
-				Title: "月末予測",
-				Value: fmt.Sprintf("$%.2f", monthly.Forecast),
-				Short: true,
+				Short: false,
 			},
 		},
 	}
