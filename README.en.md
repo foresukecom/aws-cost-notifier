@@ -328,4 +328,4 @@ git push origin v1.0.0
 
 ## License
 
-MIT License
+MIT License - See [LICENSE](LICENSE) file for details.
