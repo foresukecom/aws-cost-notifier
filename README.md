@@ -3,6 +3,8 @@
 AWS Cost Explorer APIを使用してAWSコストを取得し、Slackに通知するGoアプリケーションです。
 日次でCronから実行することで、前日のコスト、サービス別使用状況、当月の累計コストを自動通知できます。
 
+[English README is here](README.en.md)
+
 ## ⚠️ 重要: API利用料金について
 
 **このツールを1回実行するたびに約$0.02のAWS料金が発生します。**
@@ -95,8 +97,9 @@ debug = false
 
 # AWS設定
 [aws]
-region = "us-east-1"    # AWSリージョン
-profile = ""            # AWS CLIプロファイル名（空の場合はデフォルト）
+region = "us-east-1"           # AWSリージョン
+access_key_id = ""             # AWSアクセスキーID
+secret_access_key = ""         # AWSシークレットアクセスキー
 
 # Slack通知設定
 [slack]
@@ -141,9 +144,8 @@ go build -o aws-cost-notifier .
    - 合計金額
    - サービス別の内訳（上位10件、コストの高い順）
 
-2. **当月の予測**
+2. **当月の累計**
    - 月初から現在までの累計コスト
-   - 月末までの予測コスト
 
 通知メッセージはコスト金額に応じて色分けされます：
 - 緑：$50未満
@@ -305,7 +307,7 @@ aws-cost-notifier/
 
 - AWS認証情報が正しく設定されているか確認してください
 - 環境変数 `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` が設定されているか確認してください
-- AWS CLIプロファイルを使用する場合は [config.toml](config.toml) の `aws.profile` を設定してください
+- [config.toml](config.toml) の `aws.access_key_id` と `aws.secret_access_key` が正しく設定されているか確認してください
 
 ## 開発
 
